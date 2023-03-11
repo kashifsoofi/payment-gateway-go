@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS payments (
     currency_code       CHAR(3)         NOT NULL,
     reference           VARCHAR(50)     NOT NULL,
     status              VARCHAR(40)     NOT NULL,
-    created_on          TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
-    updated_on          TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
+    created_at          TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
+    updated_at          TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
     PRIMARY KEY (clustered_id),
     UNIQUE (id)
 );
