@@ -1,0 +1,90 @@
+version: '3.7'
+
+networks:
+  default:
+  localstack-net:
+    external: true
+    
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.72.0
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    command: [ "--config=/etc/config.yml", "--config=/etc/config-extras.yml" ]
+    volumes:
+      - ./otel-collector/config.yml:/etc/config.yml
+      - ./otel-collector/config-extras.yml:/etc/config-extras.yml
+    ports:
+      - "4317"          # OTLP over gRPC receiver
+      - "4318:4318"     # OTLP over HTTP receiver
+      - "9464"          # Prometheus exporter
+      - "8888"          # metrics endpoint
+
+  tempo:
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/config.yml" ]
+    volumes:
+      - ./tempo/config.yml:/etc/config.yml
+  
+  prometheus:
+    image: prom/prometheus:v2.37.6
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  loki:
+    image: grafana/loki:latest
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+  
+  grafana:
+    image: grafana/grafana-oss:9.3.6
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      # - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    depends_on:
+      - prometheus
+      - tempo
+      - loki
+
+  payments.db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - paymentsappdbdata:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=Password123
+      - POSTGRES_DB=paymentsdb
+  
+  payments.db.migrations:
+    depends_on:
+      - payments.db
+    image: payments.db.migrations
+    build:
+      context: ./db/
+      dockerfile: Dockerfile
+    command: "postgresql://postgres:Password123@payments.db:5432/paymentsdb?sslmode=disable up"
+
+  localstack-setup:
+    build:
+      context: ./localstack-setup
+    networks:
+      - localstack-net
+    environment:
+      - "AWS_SECRET_ACCESS_KEY=DUMMY_KEY"
+      - "AWS_ACCESS_KEY_ID=DUMMY_KEY"
+
+volumes:
+  paymentsappdbdata:
+  
