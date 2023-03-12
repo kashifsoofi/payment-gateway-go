@@ -8,22 +8,22 @@ import (
 )
 
 type Server struct {
-	cfg                    config.HTTPServer
-	router                 *chi.Mux
-	merchantPaymentsGetter internal.MerchantPaymentsGetter
-	paymentGetter          internal.PaymentGetter
+	cfg            config.HTTPServer
+	router         *chi.Mux
+	paymentsLister internal.PaymentsLister
+	paymentGetter  internal.PaymentGetter
 }
 
 func NewServer(
 	cfg config.HTTPServer,
-	merchantPaymentsGetter internal.MerchantPaymentsGetter,
+	paymentsLister internal.PaymentsLister,
 	paymentGetter internal.PaymentGetter,
 ) *Server {
 	srv := &Server{
-		cfg:                    cfg,
-		merchantPaymentsGetter: merchantPaymentsGetter,
-		paymentGetter:          paymentGetter,
-		router:                 chi.NewRouter(),
+		cfg:            cfg,
+		paymentsLister: paymentsLister,
+		paymentGetter:  paymentGetter,
+		router:         chi.NewRouter(),
 	}
 
 	srv.routes()

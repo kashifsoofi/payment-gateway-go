@@ -70,7 +70,7 @@ func (s *Server) listPayments() http.HandlerFunc {
 			return
 		}
 
-		payments, err := s.merchantPaymentsGetter.Get(merchantId)
+		payments, err := s.paymentsLister.List(r.Context(), merchantId)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -95,7 +95,7 @@ func (s *Server) getPayment() http.HandlerFunc {
 			return
 		}
 
-		payment, err := s.paymentGetter.Get(id)
+		payment, err := s.paymentGetter.Get(r.Context(), id)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			render.DefaultResponder(w, r, render.M{"status": "error"})

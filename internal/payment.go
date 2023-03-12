@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"time"
 
 	"github.com/google/uuid"
@@ -22,13 +23,13 @@ type Payment struct {
 }
 
 type PaymentGetter interface {
-	Get(id uuid.UUID) (*Payment, error)
+	Get(ctx context.Context, id uuid.UUID) (*Payment, error)
 }
 
-type MerchantPaymentsGetter interface {
-	Get(merchantId uuid.UUID) ([]*Payment, error)
+type PaymentsLister interface {
+	List(ctx context.Context, merchantId uuid.UUID) ([]*Payment, error)
 }
 
 type PaymentCreator interface {
-	Create(payment *Payment) (*Payment, error)
+	Create(ctx context.Context, payment *Payment) error
 }
