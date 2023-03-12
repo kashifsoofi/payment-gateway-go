@@ -1,6 +1,10 @@
 package api
 
 import (
+	"context"
+	"fmt"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 
 	"github.com/kashifsoofi/payment-gateway/internal"
@@ -41,4 +45,21 @@ func (s *Server) routes() {
 			r.Get("/", s.getPayment())
 		})
 	})
+}
+
+func (s *Server) Run(ctx context.Context) error {
+	server := http.Server{
+		Addr:         fmt.Sprintf(":%d", s.cfg.Port),
+		Handler:      s.router,
+		IdleTimeout:  s.cfg.IdleTimeout,
+		ReadTimeout:  s.cfg.ReadTimeout,
+		WriteTimeout: s.cfg.WriteTimeout,
+	}
+
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		fmt.Println(fmt.Errorf("failed to start server: %w", err))
+		return err
+	}
+
+	return nil
 }

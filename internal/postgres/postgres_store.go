@@ -10,25 +10,26 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/kashifsoofi/payment-gateway/internal"
+	"github.com/kashifsoofi/payment-gateway/internal/config"
 )
 
 const driverName = "pgx"
 
 type postgresStore struct {
-	databaseUrl string
-	dbx         *sqlx.DB
+	cfg config.Database
+	dbx *sqlx.DB
 }
 
-func NewPostgresStore(databaseUrl string) *postgresStore {
+func NewPostgresStore(cfg config.Database) *postgresStore {
 	postgresStore := &postgresStore{
-		databaseUrl: databaseUrl,
+		cfg: cfg,
 	}
 
 	return postgresStore
 }
 
 func (s *postgresStore) Connect(ctx context.Context) error {
-	dbx, err := sqlx.ConnectContext(ctx, driverName, s.databaseUrl)
+	dbx, err := sqlx.ConnectContext(ctx, driverName, s.cfg.DatabaseURL)
 	if err != nil {
 		return err
 	}

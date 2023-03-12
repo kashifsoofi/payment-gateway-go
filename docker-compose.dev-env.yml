@@ -56,12 +56,22 @@ services:
       - tempo
       - loki
 
+  payments.redis:
+    image: redis:7.0-alpine
+    ports:
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - redis-data:/data
+      - redis-conf:/usr/local/etc/redis/redis.conf
+
   payments.db:
     image: postgres:15-alpine
     ports:
       - "5432:5432"
     volumes:
-      - paymentsappdbdata:/var/lib/postgresql/data/
+      - payments-db-data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=Password123
@@ -86,5 +96,7 @@ services:
       - "AWS_ACCESS_KEY_ID=DUMMY_KEY"
 
 volumes:
-  paymentsappdbdata:
+  payments-db-data:
+  redis-data:
+  redis-conf:
   
