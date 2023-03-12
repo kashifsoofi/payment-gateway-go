@@ -45,10 +45,10 @@ func (s *postgresStore) Close() error {
 //go:embed sql/get.sql
 var getSql string
 
-func (s *postgresStore) Get(ctx context.Context, id uuid.UUID) (*internal.Payment, error) {
+func (s *postgresStore) Get(ctx context.Context, id uuid.UUID) (internal.Payment, error) {
 	err := s.Connect(ctx)
 	if err != nil {
-		return nil, err
+		return internal.Payment{}, err
 	}
 	defer s.Close()
 
@@ -59,26 +59,26 @@ func (s *postgresStore) Get(ctx context.Context, id uuid.UUID) (*internal.Paymen
 		getSql,
 		id); err != nil {
 		if err != sql.ErrNoRows {
-			return nil, fmt.Errorf("could not get payment, err: %w", err)
+			return internal.Payment{}, fmt.Errorf("could not get payment, err: %w", err)
 		}
 
-		return nil, errors.New("not found")
+		return internal.Payment{}, errors.New("not found")
 	}
 
-	return &payment, nil
+	return payment, nil
 }
 
 //go:embed sql/list.sql
 var listSql string
 
-func (s *postgresStore) List(ctx context.Context, merchantId uuid.UUID) ([]*internal.Payment, error) {
+func (s *postgresStore) List(ctx context.Context, merchantId uuid.UUID) ([]internal.Payment, error) {
 	err := s.Connect(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer s.Close()
 
-	var payments []*internal.Payment
+	var payments []internal.Payment
 	if err := s.dbx.SelectContext(
 		ctx,
 		&payments,
@@ -91,7 +91,7 @@ func (s *postgresStore) List(ctx context.Context, merchantId uuid.UUID) ([]*inte
 //go:embed sql/create.sql
 var createSql string
 
-func (s *postgresStore) Create(ctx context.Context, payment *internal.Payment) error {
+func (s *postgresStore) Create(ctx context.Context, payment internal.Payment) error {
 	err := s.Connect(ctx)
 	if err != nil {
 		return err

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/google/uuid"
 	"github.com/kashifsoofi/payment-gateway/internal"
+	"github.com/swaggest/usecase"
 )
 
 type paymentResponse struct {
@@ -46,10 +48,10 @@ func (pr *paymentResponse) Render(w http.ResponseWriter, r *http.Request) error 
 	return nil
 }
 
-func NewPaymentsListResponse(payments []*internal.Payment) []render.Renderer {
+func NewPaymentsListResponse(payments []internal.Payment) []render.Renderer {
 	list := []render.Renderer{}
 	for _, payment := range payments {
-		mr := NewPaymentResponse(payment)
+		mr := NewPaymentResponse(&payment)
 		list = append(list, mr)
 	}
 	return list
@@ -102,7 +104,33 @@ func (s *Server) getPayment() http.HandlerFunc {
 			return
 		}
 
-		pr := NewPaymentResponse(payment)
+		pr := NewPaymentResponse(&payment)
 		render.Render(w, r, pr)
 	}
+}
+
+type getPaymentRequest struct {
+	MerchantId uuid.UUID `json:"merchant_id" header:"Merchant-Id"`
+	Id         uuid.UUID `json:"id" path:"id"`
+}
+
+func getPaymentUsecase(paymentGetter internal.PaymentGetter) usecase.IOInteractor {
+	u := usecase.NewIOI(new(getPaymentRequest), new(internal.Payment), func(ctx context.Context, input, output interface{}) error {
+		var (
+			in  = input.(*getPaymentRequest)
+			out = output.(*internal.Payment)
+			err error
+		)
+
+		*out, err = paymentGetter.Get(ctx, in.Id)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	u.SetDescription("Get health status")
+
+	return u
 }
