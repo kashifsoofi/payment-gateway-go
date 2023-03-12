@@ -1,22 +1,24 @@
 package internal
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
 type Payment struct {
-	Id             uuid.UUID     `json:"id"`
-	MerchantId     uuid.UUID     `json:"merchant_id"`
-	CardHolderName string        `json:"card_holder_name"`
-	CardNumber     string        `json:"card_number"`
-	ExpiryMonth    int           `json:"expiry_month"`
-	ExpiryYear     int           `json:"expiry_year"`
-	Amount         float64       `json:"amount"`
-	CurrencyCode   string        `json:"currency_code"`
-	Reference      string        `json:"reference"`
-	Status         PaymentStatus `json:"status"`
-	CreatedAt      string        `json:"created_at"`
-	UpdatedAt      string        `json:"updated_at"`
+	Id             uuid.UUID
+	MerchantId     uuid.UUID
+	CardHolderName string
+	CardNumber     string
+	ExpiryMonth    int
+	ExpiryYear     int
+	Amount         float64
+	CurrencyCode   string
+	Reference      string
+	Status         PaymentStatus
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type PaymentGetter interface {
