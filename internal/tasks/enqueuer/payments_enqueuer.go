@@ -1,4 +1,4 @@
-package tasks
+package enqueuer
 
 import (
 	"context"
@@ -7,15 +7,16 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/kashifsoofi/payment-gateway/internal"
 	"github.com/kashifsoofi/payment-gateway/internal/config"
+	"github.com/kashifsoofi/payment-gateway/internal/tasks"
 )
 
-type paymentEnqueuer struct {
+type paymentsEnqueuer struct {
 	enqueuer *work.Enqueuer
 }
 
-func NewPaymentEnqueuer(
+func NewPaymentsEnqueuer(
 	config *config.Redis,
-) *paymentEnqueuer {
+) *paymentsEnqueuer {
 	// Make a redis pool
 	var redisPool = &redis.Pool{
 		MaxActive: config.MaxActive,
@@ -27,12 +28,12 @@ func NewPaymentEnqueuer(
 	}
 
 	var enqueuer = work.NewEnqueuer("payment-gateway", redisPool)
-	return &paymentEnqueuer{
+	return &paymentsEnqueuer{
 		enqueuer: enqueuer,
 	}
 }
 
-func (e *paymentEnqueuer) Create(ctx context.Context, payment *internal.Payment) error {
-	_, err := e.enqueuer.Enqueue("create_payment", work.Q{"payment": payment})
+func (e *paymentsEnqueuer) Create(ctx context.Context, payment *internal.Payment) error {
+	_, err := e.enqueuer.EnqueueUnique(tasks.CreatePaymentTask, work.Q{"payment": payment})
 	return err
 }
