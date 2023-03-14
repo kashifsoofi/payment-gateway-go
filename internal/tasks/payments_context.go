@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/gocraft/work"
 	"github.com/kashifsoofi/payment-gateway/internal"
@@ -21,9 +22,14 @@ func NewPaymentsContext(
 }
 
 func (c *PaymentsContext) CreatePayment(job *work.Job) error {
-	payment := job.Args["payment"].(*internal.Payment)
+	createPaymentCommandJson := job.ArgString("create_payment_command_json")
+	cmd := internal.CreatePaymentCommand{}
+	err := json.Unmarshal([]byte(createPaymentCommandJson), &cmd)
+	if err != nil {
+		return err
+	}
 
-	err := c.createPaymentHandler.Handle(context.TODO(), payment)
+	err = c.createPaymentHandler.Handle(context.TODO(), &cmd)
 	if err != nil {
 		return err
 	}

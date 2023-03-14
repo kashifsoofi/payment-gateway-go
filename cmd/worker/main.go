@@ -16,7 +16,7 @@ func initializeServer() (*tasks.Server, error) {
 	}
 
 	store := postgres.NewPostgresStore(cfg.Database)
-	createPaymentsHandler := handler.NewCreatePaymentHandler(store, store)
+	createPaymentsHandler := handler.NewCreatePaymentHandler(store, store, store)
 	paymentsContext := tasks.NewPaymentsContext(createPaymentsHandler)
 
 	service := tasks.NewServer(cfg, *paymentsContext)

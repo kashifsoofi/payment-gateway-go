@@ -2,6 +2,7 @@ package enqueuer
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
@@ -33,7 +34,8 @@ func NewPaymentsEnqueuer(
 	}
 }
 
-func (e *paymentsEnqueuer) Create(ctx context.Context, payment *internal.Payment) error {
-	_, err := e.enqueuer.EnqueueUnique(tasks.CreatePaymentTask, work.Q{"payment": payment})
+func (e *paymentsEnqueuer) Enqueue(ctx context.Context, cmd *internal.CreatePaymentCommand) error {
+	createPaymentCommandJson, _ := json.Marshal(cmd)
+	_, err := e.enqueuer.EnqueueUnique(tasks.CreatePaymentTask, work.Q{"create_payment_command_json": string(createPaymentCommandJson)})
 	return err
 }

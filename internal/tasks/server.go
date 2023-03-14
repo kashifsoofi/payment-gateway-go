@@ -7,7 +7,6 @@ import (
 
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
-	"github.com/kashifsoofi/payment-gateway/internal/config"
 )
 
 type Server struct {
@@ -20,11 +19,11 @@ func NewServer(
 ) *Server {
 	// Make a redis pool
 	var redisPool = &redis.Pool{
-		MaxActive: config.Redis.MaxActive,
-		MaxIdle:   config.Redis.MaxIdle,
-		Wait:      config.Redis.Wait,
+		MaxActive: cfg.Redis.MaxActive,
+		MaxIdle:   cfg.Redis.MaxIdle,
+		Wait:      cfg.Redis.Wait,
 		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", config.Redis.Address)
+			return redis.Dial("tcp", cfg.Redis.Address)
 		},
 	}
 
@@ -36,7 +35,7 @@ func NewServer(
 	// pool.Middleware((*CreatePaymentContext).Log)
 
 	// Map the name of the job to handler functions
-	paymentsPool.Job("create_payment", paymentsContext.CreatePayment)
+	paymentsPool.Job(CreatePaymentTask, paymentsContext.CreatePayment)
 
 	pools = append(pools, paymentsPool)
 
