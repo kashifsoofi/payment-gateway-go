@@ -6,6 +6,7 @@ import (
 
 	"github.com/kashifsoofi/payment-gateway/internal/api"
 	"github.com/kashifsoofi/payment-gateway/internal/postgres"
+	"github.com/kashifsoofi/payment-gateway/internal/tasks/enqueuer"
 )
 
 func initializeServer() (*api.Server, error) {
@@ -16,8 +17,9 @@ func initializeServer() (*api.Server, error) {
 	}
 
 	store := postgres.NewPostgresStore(cfg.Database)
+	enqueuer := enqueuer.NewPaymentsEnqueuer(&cfg.Redis)
 
-	server := api.NewServer(cfg.HttpServer, store, store)
+	server := api.NewServer(cfg.HttpServer, store, store, enqueuer)
 	return server, nil
 }
 

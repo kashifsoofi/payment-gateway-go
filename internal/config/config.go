@@ -24,6 +24,13 @@ type HTTPServer struct {
 	Store        string        `envconfig:"STORE" default:"memory"`
 }
 
+type Redis struct {
+	MaxActive int    `envconfig:"REDIS_MAX_ACTIVE" default:"5"`
+	MaxIdle   int    `envconfig:"REDIS_MAX_IDLE" default:"5"`
+	Wait      bool   `envconfig:"REDIS_WAIT" default:"true"`
+	Address   string `envconfig:"REDIS_ADDRESS" default:":6379"`
+}
+
 func Load(cfg Configuration) error {
 	err := envconfig.Process(envPrefix, cfg)
 	if err != nil {

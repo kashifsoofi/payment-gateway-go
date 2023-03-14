@@ -7,6 +7,7 @@ import (
 type ApiConfig struct {
 	HttpServer config.HTTPServer
 	Database   config.Database
+	Redis      config.Redis
 }
 
 func NewApiConfig() (ApiConfig, error) {

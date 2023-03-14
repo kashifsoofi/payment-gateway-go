@@ -10,11 +10,13 @@ import (
 type PaymentStatus int
 
 const (
-	PaymentStatusApproved PaymentStatus = iota + 1
+	PaymentStatusPending PaymentStatus = iota + 1
+	PaymentStatusApproved
 	PaymentStatusDeclined
 )
 
 const (
+	pendingName  = "pending"
 	approvedName = "approved"
 	declinedName = "declined"
 )

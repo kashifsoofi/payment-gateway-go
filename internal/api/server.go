@@ -12,22 +12,25 @@ import (
 )
 
 type Server struct {
-	cfg            config.HTTPServer
-	router         *chi.Mux
-	paymentsLister internal.PaymentsLister
-	paymentGetter  internal.PaymentGetter
+	cfg                   config.HTTPServer
+	router                *chi.Mux
+	paymentsLister        internal.PaymentsLister
+	paymentGetter         internal.PaymentGetter
+	createPaymentEnqueuer internal.CreatePaymentEnqueuer
 }
 
 func NewServer(
 	cfg config.HTTPServer,
 	paymentsLister internal.PaymentsLister,
 	paymentGetter internal.PaymentGetter,
+	createPaymentEnqueuer internal.CreatePaymentEnqueuer,
 ) *Server {
 	srv := &Server{
-		cfg:            cfg,
-		paymentsLister: paymentsLister,
-		paymentGetter:  paymentGetter,
-		router:         chi.NewRouter(),
+		cfg:                   cfg,
+		paymentsLister:        paymentsLister,
+		paymentGetter:         paymentGetter,
+		createPaymentEnqueuer: createPaymentEnqueuer,
+		router:                chi.NewRouter(),
 	}
 
 	srv.routes()
@@ -38,7 +41,7 @@ func NewServer(
 func (s *Server) routes() {
 	s.router.Get("/health", s.getHealth())
 
-	s.router.Route("/payments", func(r chi.Router) {
+	s.router.Route("/api/payments", func(r chi.Router) {
 		r.Get("/", s.listPayments())
 		r.Post("/", s.createPayment())
 		r.Route("/{id}", func(r chi.Router) {

@@ -80,11 +80,6 @@ func (s *Server) listPayments() http.HandlerFunc {
 	}
 }
 
-func (s *Server) createPayment() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-	}
-}
-
 func (s *Server) getPayment() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idParam := chi.URLParam(r, "id")
@@ -104,5 +99,43 @@ func (s *Server) getPayment() http.HandlerFunc {
 
 		pr := NewPaymentResponse(payment)
 		render.Render(w, r, pr)
+	}
+}
+
+type createPaymentRequest struct {
+	Id             uuid.UUID `json:"id"`
+	CardHolderName string    `json:"card_holder_name"`
+	CardNumber     string    `json:"card_number"`
+	ExpiryMonth    int       `json:"expiry_month"`
+	ExpiryYear     int       `json:"expiry_year"`
+	Amount         float64   `json:"amount"`
+	CurrencyCode   string    `json:"currency_code"`
+	Reference      string    `json:"reference"`
+}
+
+func (mr *createPaymentRequest) Bind(r *http.Request) error {
+	return nil
+}
+
+func (s *Server) createPayment() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		request := &createPaymentRequest{}
+		if err := render.Bind(r, request); err != nil {
+			render.Render(w, r, ErrInvalidRequest(err))
+			return
+		}
+
+		createPaymentCommand := internal.NewCreatePaymentCommand(
+			request.Id, request.CardHolderName, request.CardNumber, request.ExpiryMonth,
+			request.ExpiryYear, request.Amount, request.CurrencyCode, request.Reference,
+		)
+
+		err := s.createPaymentEnqueuer.Enqueue(r.Context(), createPaymentCommand)
+		if err != nil {
+			render.Render(w, r, ErrInternalServerError(err))
+			return
+		}
+
+		w.WriteHeader(http.StatusAccepted)
 	}
 }

@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -103,6 +104,26 @@ func (s *postgresStore) Create(ctx context.Context, payment *internal.Payment) e
 		createSql,
 		payment); err != nil {
 		return fmt.Errorf("count not insert payment, err: %w", err)
+	}
+
+	return nil
+}
+
+//go:embed sql/update_payment_status.sql
+var updatePaymentStatusSql string
+
+func (s *postgresStore) UpdatePaymentStatus(ctx context.Context, id uuid.UUID, status internal.PaymentStatus) error {
+	err := s.Connect(ctx)
+	if err != nil {
+		return err
+	}
+	defer s.Close()
+
+	if _, err := s.dbx.ExecContext(
+		ctx,
+		updatePaymentStatusSql,
+		id, status, time.Now().UTC()); err != nil {
+		return fmt.Errorf("payment status update failed, err: %w", err)
 	}
 
 	return nil
