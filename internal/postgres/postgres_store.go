@@ -4,11 +4,11 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
-	"errors"
 	"fmt"
 	"time"
 
 	"github.com/google/uuid"
+	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/kashifsoofi/payment-gateway/internal"
 	"github.com/kashifsoofi/payment-gateway/internal/config"
@@ -63,7 +63,7 @@ func (s *postgresStore) Get(ctx context.Context, id uuid.UUID) (*internal.Paymen
 			return nil, fmt.Errorf("could not get payment, err: %w", err)
 		}
 
-		return nil, errors.New("not found")
+		return nil, nil //errors.New("not found")
 	}
 
 	return &payment, nil
@@ -83,7 +83,8 @@ func (s *postgresStore) List(ctx context.Context, merchantId uuid.UUID) ([]*inte
 	if err := s.dbx.SelectContext(
 		ctx,
 		&payments,
-		listSql); err != nil {
+		listSql,
+		merchantId); err != nil {
 		return nil, fmt.Errorf("could not list movies, err: %w", err)
 	}
 	return payments, nil

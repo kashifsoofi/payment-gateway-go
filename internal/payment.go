@@ -9,17 +9,17 @@ import (
 
 type Payment struct {
 	Id             uuid.UUID
-	MerchantId     uuid.UUID
-	CardHolderName string
-	CardNumber     string
-	ExpiryMonth    int
-	ExpiryYear     int
+	MerchantId     uuid.UUID `db:"merchant_id"`
+	CardHolderName string    `db:"card_holder_name"`
+	CardNumber     string    `db:"card_number"`
+	ExpiryMonth    int       `db:"expiry_month"`
+	ExpiryYear     int       `db:"expiry_year"`
 	Amount         float64
-	CurrencyCode   string
+	CurrencyCode   string `db:"currency_code"`
 	Reference      string
 	Status         PaymentStatus
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	CreatedAt      time.Time `db:"created_at"`
+	UpdatedAt      time.Time `db:"updated_at"`
 }
 
 func NewPayment(

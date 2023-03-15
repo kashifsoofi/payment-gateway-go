@@ -12,4 +12,4 @@ SELECT
     created_at,
     updated_at
 FROM payments
-WHERE id = @id
+WHERE id = $1
