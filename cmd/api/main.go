@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kashifsoofi/payment-gateway/internal"
 	"github.com/kashifsoofi/payment-gateway/internal/api"
 	"github.com/kashifsoofi/payment-gateway/internal/postgres"
-	"github.com/kashifsoofi/payment-gateway/internal/tasks/enqueuer"
+	asynq "github.com/kashifsoofi/payment-gateway/internal/tasks/asynq/enqueuer"
+	gocraft "github.com/kashifsoofi/payment-gateway/internal/tasks/gocraft/enqueuer"
 )
 
 func initializeServer() (*api.Server, error) {
@@ -17,9 +19,14 @@ func initializeServer() (*api.Server, error) {
 	}
 
 	store := postgres.NewPostgresStore(cfg.Database)
-	enqueuer := enqueuer.NewPaymentsEnqueuer(&cfg.Redis)
+	var createPaymentEnqueuer internal.CreatePaymentEnqueuer
+	if cfg.TaskServer.TaskEngine == "asynq" {
+		createPaymentEnqueuer = asynq.NewPaymentsEnqueuer(cfg.Redis)
+	} else {
+		createPaymentEnqueuer = gocraft.NewPaymentsEnqueuer(cfg.Redis)
+	}
 
-	server := api.NewServer(cfg.HttpServer, store, store, enqueuer)
+	server := api.NewServer(cfg.HttpServer, store, store, createPaymentEnqueuer)
 	return server, nil
 }
 

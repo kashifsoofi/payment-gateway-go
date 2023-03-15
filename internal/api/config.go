@@ -8,6 +8,7 @@ type ApiConfig struct {
 	HttpServer config.HTTPServer
 	Database   config.Database
 	Redis      config.Redis
+	TaskServer config.TaskServer
 }
 
 func NewApiConfig() (ApiConfig, error) {

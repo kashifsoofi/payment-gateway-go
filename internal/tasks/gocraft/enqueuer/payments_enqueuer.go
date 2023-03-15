@@ -16,15 +16,15 @@ type paymentsEnqueuer struct {
 }
 
 func NewPaymentsEnqueuer(
-	config *config.Redis,
+	cfg config.Redis,
 ) *paymentsEnqueuer {
 	// Make a redis pool
 	var redisPool = &redis.Pool{
-		MaxActive: config.MaxActive,
-		MaxIdle:   config.MaxIdle,
-		Wait:      config.Wait,
+		MaxActive: cfg.MaxActive,
+		MaxIdle:   cfg.MaxIdle,
+		Wait:      cfg.Wait,
 		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", config.Address)
+			return redis.Dial("tcp", cfg.Address)
 		},
 	}
 
