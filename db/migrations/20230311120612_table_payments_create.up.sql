@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS payments (
     amount              DECIMAL(12, 4)  NOT NULL,
     currency_code       CHAR(3)         NOT NULL,
     reference           VARCHAR(50)     NOT NULL,
-    status              VARCHAR(40)     NOT NULL,
+    status              INT             NOT NULL,
     created_at          TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
     updated_at          TIMESTAMP WITHOUT TIME ZONE DEFAULT (now() AT TIME ZONE 'utc') NOT NULL,
     PRIMARY KEY (clustered_id),

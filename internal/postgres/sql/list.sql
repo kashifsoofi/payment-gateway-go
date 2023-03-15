@@ -12,4 +12,4 @@ SELECT
     created_at,
     updated_at
 FROM payments
-WHERE merchant_id = @merchant_id
+WHERE merchant_id = $1

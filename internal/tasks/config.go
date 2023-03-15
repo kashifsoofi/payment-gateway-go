@@ -5,8 +5,9 @@ import (
 )
 
 type WorkerConfig struct {
-	Database config.Database
-	Redis    config.Redis
+	TaskServer config.TaskServer
+	Database   config.Database
+	Redis      config.Redis
 }
 
 func NewWorkerConfig() (WorkerConfig, error) {

@@ -13,16 +13,16 @@ INSERT INTO payments (
     updated_at
 )
 VALUES (
-    @id,
-    @merchant_id,
-    @card_holder_name,
-    @card_number,
-    @expiry_month,
-    @expiry_year,
-    @amount,
-    @currency_code,
-    @reference,
-    @status,
-    @created_at,
-    @updated_at
+    :id,
+    :merchant_id,
+    :card_holder_name,
+    :card_number,
+    :expiry_month,
+    :expiry_year,
+    :amount,
+    :currency_code,
+    :reference,
+    :status,
+    :created_at,
+    :updated_at
 )

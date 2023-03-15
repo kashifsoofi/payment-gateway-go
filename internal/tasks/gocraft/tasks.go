@@ -6,7 +6,7 @@ import (
 
 	"github.com/gocraft/work"
 	"github.com/kashifsoofi/payment-gateway/internal"
-	"github.com/kashifsoofi/payment-gateway/internal/tasks/handler"
+	"github.com/kashifsoofi/payment-gateway/internal/tasks/gocraft/handler"
 )
 
 type PaymentsContext struct {

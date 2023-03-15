@@ -31,6 +31,10 @@ type Redis struct {
 	Address   string `envconfig:"REDIS_ADDRESS" default:":6379"`
 }
 
+type TaskServer struct {
+	TaskEngine string `envconfig:"DATABASE_LOG_LEVEL" default:"asynq"`
+}
+
 func Load(cfg Configuration) error {
 	err := envconfig.Process(envPrefix, cfg)
 	if err != nil {
